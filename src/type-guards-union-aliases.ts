@@ -16,7 +16,7 @@ function usePet2(pet: Pet) {
 	else pet.fly()
 }
 
-// using own type checking function
+// using own type checking function (type predicate)
 function isFish(pet: Pet): pet is Fish {
 	return (pet as Fish).swim !== undefined
 }
