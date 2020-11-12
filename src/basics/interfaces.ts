@@ -1,3 +1,4 @@
+// no trace of interfaces is left in transpiled js code (they're just a safety and code organization feature for compile time)
 // our neat type contracts
 interface Prod {
 	price: string
@@ -39,8 +40,8 @@ function createOrder(id: string) {
 		calculateTotal: function (this: Order) {
 			return this.products
 				.map((p: Prod) => +p.price)
-        .reduce((acc, cur) => acc + cur)
-        .toFixed(2)
+				.reduce((acc, cur) => acc + cur)
+				.toFixed(2)
 		}
 	}
 }
