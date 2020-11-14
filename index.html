@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<script src="./dist/intermediate/app.js" defer></script>
+		<script src="./dist/decorators/app.js" defer></script>
 		<title>Document</title>
 		<link
 			rel="stylesheet"
@@ -16,6 +16,12 @@
 		</style>
 	</head>
 	<body>
-		<button>Click Moi</button>
+		<div>
+			<form action="post">
+				<input type="text" name="" id="title" placeholder="course title" />
+				<input type="number" name="" id="price" placeholder="course price" />
+				<button type="submit">Save</button>
+			</form>
+		</div>
 	</body>
 </html>
