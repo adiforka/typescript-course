@@ -41,6 +41,40 @@ function Autobind(_: any, _2: string, propDesc: PropertyDescriptor) {
 	return moddedDesc
 }
 
+class ProjectList {
+	templateElement: HTMLTemplateElement
+	hostElement: HTMLDivElement
+	renderedElement: HTMLElement
+
+	constructor(private type: 'active' | 'completed') {
+		this.templateElement = document.getElementById(
+			'project-list'
+		) as HTMLTemplateElement
+		this.hostElement = document.getElementById('app') as HTMLDivElement
+
+		const importedNode = document.importNode(this.templateElement.content, true)
+		this.renderedElement = importedNode.firstElementChild as HTMLElement
+		this.renderedElement.id = `${this.type}-projects`
+		this.attach()
+		this.renderContent()
+	}
+
+	private attach() {
+		this.hostElement.insertAdjacentElement('beforeend', this.renderedElement)
+	}
+
+	private renderContent() {
+		// render header for list
+		this.renderedElement.querySelector(
+			'h2'
+		)!.textContent = `${this.type.toUpperCase()} PROJECTS`
+		//get list id
+		const listId = `${this.type}-projects-list`
+		// render list id
+		this.renderedElement.getElementsByTagName('ul')[0]!.id = listId
+	}
+}
+
 class ProjectInput {
 	templateElement: HTMLTemplateElement
 	hostElement: HTMLDivElement
@@ -54,7 +88,7 @@ class ProjectInput {
 		this.templateElement = <HTMLTemplateElement>(
 			document.getElementById('project-input')!
 		)
-		this.hostElement = <HTMLDivElement>document.getElementById('app')!
+		this.hostElement = <HTMLDivElement>document.getElementById('app')
 		const importedNode = document.importNode(this.templateElement.content, true)
 		this.element = importedNode.firstElementChild as HTMLFormElement
 		this.element.id = 'user-input'
@@ -138,4 +172,6 @@ class ProjectInput {
 	}
 }
 
-new ProjectInput()
+const projectInput = new ProjectInput()
+const activeProjectList = new ProjectList('active')
+const completedProjectList = new ProjectList('completed')
