@@ -1,3 +1,40 @@
+type Listener<T> = (items: T) => void
+// some inheritance overkill
+class State<T> {
+	protected listeners: Listener<T>[] = []
+
+	addListener(listenerFn: Listener<T>) {
+		this.listeners.push(listenerFn)
+	}
+}
+
+// using a singleton to manage application state
+class ProjectState extends State<Project> {
+	private projects: Project[] = []
+	private static instance: ProjectState
+
+	private constructor() {
+		super()
+	}
+
+	static getInstance() {
+		if (this.instance) {
+			return this.instance
+		} else {
+			this.instance = new ProjectState()
+			return this.instance
+		}
+	}
+
+	addProject(title: string, desc: string, people: number) {
+		const newProject = new Project(title, desc, people, ProjectStatus.ACTIVE)
+		this.projects.push(newProject)
+		for (const listenerFn of this.listeners) {
+			listenerFn(this.projects.slice())
+		}
+	}
+}
+
 type Validatable = {
 	value: string | number
 	required: boolean
@@ -41,29 +78,89 @@ function Autobind(_: any, _2: string, propDesc: PropertyDescriptor) {
 	return moddedDesc
 }
 
-class ProjectList {
-	templateElement: HTMLTemplateElement
-	hostElement: HTMLDivElement
-	renderedElement: HTMLElement
+enum ProjectStatus {
+	ACTIVE,
+	COMPLETED
+}
 
-	constructor(private type: 'active' | 'completed') {
+class Project {
+	private _id = Math.floor(Math.random() * 100_000).toString()
+	constructor(
+		public title: string,
+		public description: string,
+		public people: number,
+		private readonly _status: ProjectStatus
+	) {}
+
+	get id() {
+		return this._id
+	}
+
+	get status() {
+		return this._status
+	}
+}
+
+abstract class BaseComponent<T extends HTMLElement, U extends HTMLElement> {
+	protected templateElement: HTMLTemplateElement
+	protected hostElement: T
+	protected renderedElement: U
+
+	constructor(
+		templateELId: string,
+		hostElId: string,
+		insertAtStart: boolean,
+		rendElId?: string
+	) {
 		this.templateElement = document.getElementById(
-			'project-list'
-		) as HTMLTemplateElement
-		this.hostElement = document.getElementById('app') as HTMLDivElement
+			templateELId
+		)! as HTMLTemplateElement
+		this.hostElement = document.getElementById(hostElId)! as T
 
 		const importedNode = document.importNode(this.templateElement.content, true)
-		this.renderedElement = importedNode.firstElementChild as HTMLElement
-		this.renderedElement.id = `${this.type}-projects`
-		this.attach()
+		this.renderedElement = importedNode.firstElementChild as U
+		if (rendElId) {
+			this.renderedElement.id = `${rendElId}-projects`
+		}
+
+		this.attach(insertAtStart)
+	}
+
+	private attach(insertAtBeginning: boolean) {
+		this.hostElement.insertAdjacentElement(
+			insertAtBeginning ? 'afterbegin' : 'beforeend',
+			this.renderedElement
+		)
+	}
+
+	abstract configure(): void
+	abstract renderContent(): void
+}
+
+class ProjectList extends BaseComponent<HTMLDivElement, HTMLElement> {
+	assignedProjects: Project[]
+
+	constructor(private type: 'active' | 'completed') {
+		super('project-list', 'app', false, `${type}-projects`)
+		this.assignedProjects = []
+
+		this.configure()
 		this.renderContent()
 	}
 
-	private attach() {
-		this.hostElement.insertAdjacentElement('beforeend', this.renderedElement)
+	configure() {
+		projectState.addListener((projects: Project[]) => {
+			const relevantProjects = projects.filter((project) => {
+				if (this.type === 'active') {
+					return project.status === ProjectStatus.ACTIVE
+				} else return project.status === ProjectStatus.COMPLETED
+			})
+			this.assignedProjects = relevantProjects
+			this.renderProjects(this.assignedProjects)
+		})
 	}
 
-	private renderContent() {
+	renderContent() {
 		// render header for list
 		this.renderedElement.querySelector(
 			'h2'
@@ -73,37 +170,47 @@ class ProjectList {
 		// render list id
 		this.renderedElement.getElementsByTagName('ul')[0]!.id = listId
 	}
+
+	private renderProjects(projects: Project[]) {
+		const listEl = document.getElementById(
+			`${this.type}-projects-list`
+		) as HTMLUListElement
+		// clear previously rendered items
+		listEl.innerHTML = ''
+		for (const project of projects) {
+			const listItem = document.createElement('li')
+			listItem.textContent = project.title
+			listEl.appendChild(listItem)
+		}
+	}
 }
 
-class ProjectInput {
-	templateElement: HTMLTemplateElement
-	hostElement: HTMLDivElement
-	element: HTMLFormElement
+class ProjectInput extends BaseComponent<HTMLDivElement, HTMLFormElement> {
 	titleInput: HTMLInputElement
 	descInput: HTMLInputElement
 	pplInput: HTMLInputElement
 
 	constructor() {
-		// selection logic in the construtor
-		this.templateElement = <HTMLTemplateElement>(
-			document.getElementById('project-input')!
-		)
-		this.hostElement = <HTMLDivElement>document.getElementById('app')
-		const importedNode = document.importNode(this.templateElement.content, true)
-		this.element = importedNode.firstElementChild as HTMLFormElement
-		this.element.id = 'user-input'
+		super('project-input', 'app', true, 'user-input')
 
-		this.titleInput = this.element.querySelector('#title') as HTMLInputElement
-		this.descInput = this.element.querySelector(
+		this.titleInput = this.renderedElement.querySelector(
+			'#title'
+		) as HTMLInputElement
+		this.descInput = this.renderedElement.querySelector(
 			'#description'
 		) as HTMLInputElement
-		this.pplInput = this.element.querySelector('#people') as HTMLInputElement
-		this.config()
-		this.attach()
+		this.pplInput = this.renderedElement.querySelector(
+			'#people'
+		) as HTMLInputElement
+		this.configure()
 	}
 
-	private config() {
-		this.element.addEventListener('submit', this.submitHandler)
+	configure() {
+		this.renderedElement.addEventListener('submit', this.submitHandler)
+	}
+
+	renderContent() {
+		// dummy method -- bad practice. this is why inheritnce blows
 	}
 
 	private gatherUserInput(): [string, string, number] | void {
@@ -112,18 +219,17 @@ class ProjectInput {
 		const ppl = +this.pplInput.value
 
 		// setup for validation
-
 		const titleValidatable: Validatable = {
 			value: title,
 			required: true,
-			minLen: 5,
+			minLen: 2,
 			maxLen: 30
 		}
 
 		const descValidatable: Validatable = {
 			value: desc,
 			required: true,
-			minLen: 10,
+			minLen: 2,
 			maxLen: 200
 		}
 
@@ -133,7 +239,6 @@ class ProjectInput {
 			minVal: 1,
 			maxVal: 5
 		}
-
 		// simple validation
 		if (
 			!(
@@ -155,14 +260,9 @@ class ProjectInput {
 		const userInput = this.gatherUserInput()
 		if (Array.isArray(userInput)) {
 			const [title, desc, ppl] = userInput
-			console.log(title, desc, ppl)
+			projectState.addProject(title, desc, ppl)
 			this.clearInputs()
 		}
-	}
-
-	private attach() {
-		// rendering logic
-		this.hostElement.insertAdjacentElement('afterbegin', this.element)
 	}
 
 	private clearInputs() {
@@ -172,6 +272,7 @@ class ProjectInput {
 	}
 }
 
+const projectState = ProjectState.getInstance()
 const projectInput = new ProjectInput()
 const activeProjectList = new ProjectList('active')
 const completedProjectList = new ProjectList('completed')
