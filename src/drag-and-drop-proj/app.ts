@@ -107,7 +107,7 @@ function Autobind(_: any, _2: string, propDesc: PropertyDescriptor) {
 abstract class BaseComponent<T extends HTMLElement, U extends HTMLElement> {
 	protected templateElement: HTMLTemplateElement
 	protected hostElement: T
-	protected renderedElement: U
+	protected element: U
 
 	constructor(
 		templateELId: string,
@@ -121,9 +121,9 @@ abstract class BaseComponent<T extends HTMLElement, U extends HTMLElement> {
 		this.hostElement = document.getElementById(hostElId)! as T
 
 		const importedNode = document.importNode(this.templateElement.content, true)
-		this.renderedElement = importedNode.firstElementChild as U
+		this.element = importedNode.firstElementChild as U
 		if (rendElId) {
-			this.renderedElement.id = `${rendElId}-projects`
+			this.element.id = `${rendElId}-projects`
 		}
 
 		this.attach(insertAtStart)
@@ -132,12 +132,34 @@ abstract class BaseComponent<T extends HTMLElement, U extends HTMLElement> {
 	private attach(insertAtBeginning: boolean) {
 		this.hostElement.insertAdjacentElement(
 			insertAtBeginning ? 'afterbegin' : 'beforeend',
-			this.renderedElement
+			this.element
 		)
 	}
 
 	abstract configure(): void
 	abstract renderContent(): void
+}
+
+// Project item class
+class ProjectItem extends BaseComponent<HTMLUListElement, HTMLLIElement> {
+	private project: Project
+
+	constructor(hostId: string, project: Project) {
+		super('single-project', hostId, false, project.id)
+		this.project = project
+
+		this.configure()
+		this.renderContent()
+	}
+
+	configure(): void {}
+	renderContent(): void {
+		this.element.querySelector('h2')!.textContent = this.project.title
+		this.element.querySelector(
+			'h3'
+		)!.textContent = this.project.people.toString()
+		this.element.querySelector('p')!.textContent = this.project.description
+	}
 }
 
 // Project list class
@@ -167,13 +189,13 @@ class ProjectList extends BaseComponent<HTMLDivElement, HTMLElement> {
 
 	renderContent() {
 		// render header for list
-		this.renderedElement.querySelector(
+		this.element.querySelector(
 			'h2'
 		)!.textContent = `${this.type.toUpperCase()} PROJECTS`
 		//get list id
 		const listId = `${this.type}-projects-list`
 		// render list id
-		this.renderedElement.getElementsByTagName('ul')[0]!.id = listId
+		this.element.getElementsByTagName('ul')[0]!.id = listId
 	}
 
 	private renderProjects() {
@@ -183,9 +205,7 @@ class ProjectList extends BaseComponent<HTMLDivElement, HTMLElement> {
 		// clear previously rendered items
 		listEl.innerHTML = ''
 		for (const project of this.assignedProjects) {
-			const listItem = document.createElement('li')
-			listItem.textContent = project.title
-			listEl.appendChild(listItem)
+			new ProjectItem(this.element.querySelector('ul')!.id, project)
 		}
 	}
 }
@@ -199,20 +219,16 @@ class ProjectInput extends BaseComponent<HTMLDivElement, HTMLFormElement> {
 	constructor() {
 		super('project-input', 'app', true, 'user-input')
 
-		this.titleInput = this.renderedElement.querySelector(
-			'#title'
-		) as HTMLInputElement
-		this.descInput = this.renderedElement.querySelector(
+		this.titleInput = this.element.querySelector('#title') as HTMLInputElement
+		this.descInput = this.element.querySelector(
 			'#description'
 		) as HTMLInputElement
-		this.pplInput = this.renderedElement.querySelector(
-			'#people'
-		) as HTMLInputElement
+		this.pplInput = this.element.querySelector('#people') as HTMLInputElement
 		this.configure()
 	}
 
 	configure() {
-		this.renderedElement.addEventListener('submit', this.submitHandler)
+		this.element.addEventListener('submit', this.submitHandler)
 	}
 
 	renderContent() {
