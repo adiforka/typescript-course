@@ -1,4 +1,20 @@
-type Listener<T> = (items: T) => void
+enum ProjectStatus {
+	ACTIVE,
+	COMPLETED
+}
+
+class Project {
+	constructor(
+		public id: string,
+		public title: string,
+		public description: string,
+		public people: number,
+		public status: ProjectStatus
+	) {}
+}
+
+// Project state management
+type Listener<T> = (items: T[]) => void
 // some inheritance overkill
 class State<T> {
 	protected listeners: Listener<T>[] = []
@@ -27,7 +43,13 @@ class ProjectState extends State<Project> {
 	}
 
 	addProject(title: string, desc: string, people: number) {
-		const newProject = new Project(title, desc, people, ProjectStatus.ACTIVE)
+		const newProject = new Project(
+			Math.floor(Math.random() * 10_000).toString(),
+			title,
+			desc,
+			people,
+			ProjectStatus.ACTIVE
+		)
 		this.projects.push(newProject)
 		for (const listenerFn of this.listeners) {
 			listenerFn(this.projects.slice())
@@ -35,6 +57,9 @@ class ProjectState extends State<Project> {
 	}
 }
 
+const projectState = ProjectState.getInstance()
+
+// Validation
 type Validatable = {
 	value: string | number
 	required: boolean
@@ -78,29 +103,7 @@ function Autobind(_: any, _2: string, propDesc: PropertyDescriptor) {
 	return moddedDesc
 }
 
-enum ProjectStatus {
-	ACTIVE,
-	COMPLETED
-}
-
-class Project {
-	private _id = Math.floor(Math.random() * 100_000).toString()
-	constructor(
-		public title: string,
-		public description: string,
-		public people: number,
-		private readonly _status: ProjectStatus
-	) {}
-
-	get id() {
-		return this._id
-	}
-
-	get status() {
-		return this._status
-	}
-}
-
+// Component base class
 abstract class BaseComponent<T extends HTMLElement, U extends HTMLElement> {
 	protected templateElement: HTMLTemplateElement
 	protected hostElement: T
@@ -137,6 +140,7 @@ abstract class BaseComponent<T extends HTMLElement, U extends HTMLElement> {
 	abstract renderContent(): void
 }
 
+// Project list class
 class ProjectList extends BaseComponent<HTMLDivElement, HTMLElement> {
 	assignedProjects: Project[]
 
@@ -153,10 +157,11 @@ class ProjectList extends BaseComponent<HTMLDivElement, HTMLElement> {
 			const relevantProjects = projects.filter((project) => {
 				if (this.type === 'active') {
 					return project.status === ProjectStatus.ACTIVE
-				} else return project.status === ProjectStatus.COMPLETED
+				}
+				return project.status === ProjectStatus.COMPLETED
 			})
 			this.assignedProjects = relevantProjects
-			this.renderProjects(this.assignedProjects)
+			this.renderProjects()
 		})
 	}
 
@@ -171,13 +176,13 @@ class ProjectList extends BaseComponent<HTMLDivElement, HTMLElement> {
 		this.renderedElement.getElementsByTagName('ul')[0]!.id = listId
 	}
 
-	private renderProjects(projects: Project[]) {
+	private renderProjects() {
 		const listEl = document.getElementById(
 			`${this.type}-projects-list`
 		) as HTMLUListElement
 		// clear previously rendered items
 		listEl.innerHTML = ''
-		for (const project of projects) {
+		for (const project of this.assignedProjects) {
 			const listItem = document.createElement('li')
 			listItem.textContent = project.title
 			listEl.appendChild(listItem)
@@ -185,6 +190,7 @@ class ProjectList extends BaseComponent<HTMLDivElement, HTMLElement> {
 	}
 }
 
+// Project input class
 class ProjectInput extends BaseComponent<HTMLDivElement, HTMLFormElement> {
 	titleInput: HTMLInputElement
 	descInput: HTMLInputElement
@@ -234,7 +240,7 @@ class ProjectInput extends BaseComponent<HTMLDivElement, HTMLFormElement> {
 		}
 
 		const pplValidatable: Validatable = {
-			value: ppl,
+			value: +ppl,
 			required: true,
 			minVal: 1,
 			maxVal: 5
@@ -249,7 +255,7 @@ class ProjectInput extends BaseComponent<HTMLDivElement, HTMLFormElement> {
 		) {
 			alert('invalid input. try again')
 		} else {
-			return [title, desc, ppl]
+			return [title, desc, +ppl]
 		}
 	}
 
@@ -272,7 +278,6 @@ class ProjectInput extends BaseComponent<HTMLDivElement, HTMLFormElement> {
 	}
 }
 
-const projectState = ProjectState.getInstance()
 const projectInput = new ProjectInput()
 const activeProjectList = new ProjectList('active')
 const completedProjectList = new ProjectList('completed')
