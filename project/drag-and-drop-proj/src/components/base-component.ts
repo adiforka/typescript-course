@@ -21,7 +21,7 @@ namespace App {
 			)
 			this.element = importedNode.firstElementChild as U
 			if (rendElId) {
-				this.element.id = `${rendElId}-projects`
+				this.element.id = rendElId
 			}
 
 			this.attach(insertAtStart)

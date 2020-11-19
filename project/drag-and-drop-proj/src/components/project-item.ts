@@ -1,3 +1,8 @@
+///<reference path="../components/base-component.ts"/>
+/// <reference path="../models/drag-drop.ts"/>
+///<reference path="../models/project.ts"/>
+///<reference path="../decorators/autobind.ts"/>
+
 namespace App {
   export class ProjectItem
 		extends BaseComponent<HTMLUListElement, HTMLLIElement>
