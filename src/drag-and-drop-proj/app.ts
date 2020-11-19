@@ -63,6 +63,23 @@ class ProjectState extends State<Project> {
 			ProjectStatus.ACTIVE
 		)
 		this.projects.push(newProject)
+		this.updateListeners()
+	}
+
+	// switch project status
+	moveProject(projectId: string, newStatus: ProjectStatus) {
+		// get searched project obj and change its status
+		const project = this.projects.find((p) => p.id === projectId)
+		// update project status and notify the listeners only if it's different
+		// from the new state, i.e. only if there's an actual status change
+		// we do this check to make sure we don't re-render an unchanged element
+		if (project && project.status !== newStatus) {
+			project.status = newStatus
+			this.updateListeners()
+		}
+	}
+
+	private updateListeners() {
 		for (const listenerFn of this.listeners) {
 			listenerFn(this.projects.slice())
 		}
@@ -219,14 +236,19 @@ class ProjectList
 		}
 	}
 
+	@Autobind
 	dropHandler(e: DragEvent): void {
-		console.log(e.dataTransfer!.getData('text/plain'))
+		const projectId = e.dataTransfer!.getData('text/plain')
+		projectState.moveProject(
+			projectId,
+			this.type === 'active' ? ProjectStatus.ACTIVE : ProjectStatus.COMPLETED
+		)
 	}
 
 	@Autobind
 	dragLeaveHandler(_: DragEvent): void {
 		const listEl = this.element.querySelector('ul')!
-		listEl.classList.remove('draggable')
+		listEl.classList.remove('droppable')
 	}
 
 	configure() {
@@ -247,14 +269,12 @@ class ProjectList
 	}
 
 	renderContent() {
-		// render header for list
+		const listId = `${this.type}-projects-list`
+		this.element.querySelector('ul')!.id = listId
 		this.element.querySelector(
 			'h2'
-		)!.textContent = `${this.type.toUpperCase()} PROJECTS`
-		//get list id
-		const listId = `${this.type}-projects-list`
-		// render list id
-		this.element.getElementsByTagName('ul')[0]!.id = listId
+    )!.textContent = `${this.type.toUpperCase()} PROJECTS`
+    console.log(this.element.querySelector('ul')!.id)
 	}
 
 	private renderProjects() {
