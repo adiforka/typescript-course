@@ -1,9 +1,9 @@
-import { Component} from '../components/base-component.js'
-import { DragTarget } from '../models/drag-drop.js'
-import { Autobind }from '../decorators/autobind.js'
-import { Project, ProjectStatus } from '../models/project.js'
-import { projectState } from '../state/project-state.js'
-import { ProjectItem } from '../components/project-item.js'
+import { Component} from '../components/base-component'
+import { DragTarget } from '../models/drag-drop'
+import { Autobind }from '../decorators/autobind'
+import { Project, ProjectStatus } from '../models/project'
+import { projectState } from '../state/project-state'
+import { ProjectItem } from '../components/project-item'
 
 export class ProjectList
 	extends Component<HTMLDivElement, HTMLElement>
@@ -57,8 +57,8 @@ export class ProjectList
 			})
 			this.assignedProjects = relevantProjects
 			this.renderProjects()
-		})
-	}
+    })
+  }
 
 	renderContent() {
 		const listId = `${this.type}-projects-list`
