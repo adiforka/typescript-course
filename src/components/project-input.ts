@@ -1,4 +1,4 @@
-import { Component } from '../components/base-component'
+import { Component } from './base-component'
 import { Autobind } from '../decorators/autobind'
 import { projectState } from '../state/project-state'
 import { Validatable, validate } from '../util/validation'

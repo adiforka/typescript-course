@@ -1,13 +1,15 @@
 const path = require('path')
 
 module.exports = {
-	entry: './project/drag-and-drop-proj/src/app.ts',
+  mode: 'development',
+	entry: './src/app.ts',
 	output: {
 		filename: 'bundle.js',
     // webpack wants absolute path (had to tweak the string path 
     //cause I wanted to put webpack separate from the root project folder 
     // -- fit all project in one repo, yeah)
-		path: path.resolve(__dirname, '/project/drag-and-drop-proj/dist')
+    path: path.resolve(__dirname, 'dist'),
+    publicPath: 'dist'
 	},
 	// tell webpack there will be source files included and to wire them up
 	// to the bundle it generates
@@ -25,5 +27,8 @@ module.exports = {
 	},
 	resolve: {
 		extensions: ['.ts', '.js']
-	}
+  },
+  devServer: {
+    publicPath: 'dist'
+  }
 }
