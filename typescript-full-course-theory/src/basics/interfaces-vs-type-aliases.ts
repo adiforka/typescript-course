@@ -2,19 +2,19 @@
 // have to compose new type aliases and/or use intersection types
 // with interfaces
 interface Mammal {
-	name: string
+  name: string
 }
 
 interface Bear extends Mammal {
-	honey: boolean
+  honey: boolean
 }
 
 interface Mammal {
-	size: string
+  size: string
 }
 
 const getBear = (name: string, honey: boolean, size: string) => {
-	return { name, honey, size }
+  return { name, honey, size }
 }
 
 const bear = getBear('Pooh', true, 'large')
@@ -25,7 +25,7 @@ type Animal = { name: string }
 type Possum = Animal & { house: boolean }
 
 const getPossum = (name: string, house: boolean) => {
-	return { name, house }
+  return { name, house }
 }
 
 const possum = getPossum('El Possumo', false)
@@ -37,7 +37,6 @@ console.log(possum)
 type TU = string | boolean
 
 interface IU {
-	readonly name: string
-	readonly married: boolean
+  readonly name: string
+  readonly married: boolean
 }
-

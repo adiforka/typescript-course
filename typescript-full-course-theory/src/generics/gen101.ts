@@ -14,8 +14,8 @@ console.log(tuples)
 
 // generic promise
 const prom: Promise<string> = new Promise((resolve, reject) => {
-	setTimeout(() => resolve('this has been resolved'), 1000)
-	setTimeout(() => reject('error error error'), 1000)
+  setTimeout(() => resolve('this has been resolved'), 1000)
+  setTimeout(() => reject('error error error'), 1000)
 })
 
-prom.then((res) => console.log(res))
+prom.then(res => console.log(res))

@@ -8,7 +8,7 @@ type Product = { title: string; price: number; isListed: boolean }
 // }
 
 function processProduct(product: Product) {
-	//
+  //
 }
 
 processProduct({ title: 'A Book', price: 19.99, isListed: false })
@@ -20,4 +20,3 @@ let u: User = 'Michael'
 console.log(u)
 u = { name: 'Mini' }
 console.log(u.name)
-

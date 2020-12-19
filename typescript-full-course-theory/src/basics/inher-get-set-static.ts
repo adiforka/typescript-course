@@ -3,65 +3,65 @@
 type Employee = { name: string }
 
 abstract class BaseDepartment {
-	// private readonly id: string;
-	// private name: string;
-	protected employees: Employee[] = []
+  // private readonly id: string;
+  // private name: string;
+  protected employees: Employee[] = []
 
-	constructor(protected readonly id: string, protected readonly name: string) {}
+  constructor(protected readonly id: string, protected readonly name: string) {}
 
-	static createEmployee(name: string) {
-		return { name }
-	}
+  static createEmployee(name: string) {
+    return { name }
+  }
 
-	describe(this: BaseDepartment) {
-		console.log(`Department (${this.id}): ${this.name}`)
-	}
+  describe(this: BaseDepartment) {
+    console.log(`Department (${this.id}): ${this.name}`)
+  }
 
-	addEmployee(employee: Employee) {
-		this.employees.push(employee)
-	}
+  addEmployee(employee: Employee) {
+    this.employees.push(employee)
+  }
 
-	printEmployeeInformation() {
-		console.log(`Department size: ${this.employees.length}`)
-		console.log(`Staff lineup: ${this.employees.map((e) => e.name)}`)
-	}
+  printEmployeeInformation() {
+    console.log(`Department size: ${this.employees.length}`)
+    console.log(`Staff lineup: ${this.employees.map(e => e.name)}`)
+  }
 }
 
 class ITDepartment extends BaseDepartment {
-	constructor(id: string) {
-		super(id, 'IT')
-	}
+  constructor(id: string) {
+    super(id, 'IT')
+  }
 }
 
 class AccountingDepartment extends BaseDepartment {
-	private reports: string[] = []
-	private lastReport: string | undefined
+  private reports: string[] = []
+  private lastReport: string | undefined
 
-	constructor(id: string) {
-		super(id, 'IT')
-	}
+  constructor(id: string) {
+    super(id, 'IT')
+  }
 
-	addReport(text: string) {
-		this.reports.push(text)
-		this.lastReport = text
-	}
+  addReport(text: string) {
+    this.reports.push(text)
+    this.lastReport = text
+  }
 
-	printReports() {
-		console.log(this.reports)
-	}
+  printReports() {
+    console.log(this.reports)
+  }
 
-	get mostRecentReport() {
-		if (!this.lastReport) throw new Error('no report found')
-		return this.lastReport
-	}
+  get mostRecentReport() {
+    if (!this.lastReport) throw new Error('no report found')
+    return this.lastReport
+  }
 
-	set mostRecentReport(report: string) {
-		// makes it impossible to pass in an empty string
-		if (!report) {
-			throw new Error(`Please pass in a valid value`)
-		}
-		this.addReport(report)
-	}
+  set mostRecentReport(report: string) {
+    // makes it impossible to pass in an empty string
+    if (!report) {
+      throw new Error(`Please pass in a valid value`)
+    }
+    this.addReport(report)
+  }
 }
 
 // demo zone

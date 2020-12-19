@@ -9,22 +9,22 @@
 // can take an arg that'll be usable inside the decorator
 
 function Logger(logString: string) {
-	return function (target: Function) {
-		console.log(logString)
-		console.log(`running logger decorator`)
-	}
+  return function (target: Function) {
+    console.log(logString)
+    console.log(`running logger decorator`)
+  }
 }
 
 // Angular-ish
 function WithTemplate(template: string, hookId: string) {
   // this tells ts we know we need to provide and argument, but we won't be using it, so it won't bug us about not using it
-	return function (_: Function) {
+  return function (_: Function) {
     console.log(`running with template decorator`)
-		const hookEl = document.getElementById(hookId)
-		if (hookEl) {
-			hookEl.innerHTML = template
-		}
-	}
+    const hookEl = document.getElementById(hookId)
+    if (hookEl) {
+      hookEl.innerHTML = template
+    }
+  }
 }
 
 // the order in which decorators on a class execute is bottom-up
@@ -33,7 +33,7 @@ function WithTemplate(template: string, hookId: string) {
 @WithTemplate('<h1>My Dude</h1>', 'app')
 @Logger('logging dude')
 class Dude {
-	constructor(private name: string) {}
+  constructor(private name: string) {}
 }
 
 const dude = new Dude('Jeff')

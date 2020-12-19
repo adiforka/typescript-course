@@ -1,26 +1,26 @@
 // not so unlike interface extensions (interface inheritance of combined interfaces) -- from TS Handbook
 interface ErrorHandler {
-	success: boolean
-	error?: { message: string }
+  success: boolean
+  error?: { message: string }
 }
 
 interface ArtworksData {
-	artworks: { title: string }[]
+  artworks: { title: string }[]
 }
 
 interface ArtistsData {
-	artists: { name: string }[]
+  artists: { name: string }[]
 }
 
 // give both ArtworksData and ArtistsDate error-handling capability
 type ArtistsResponse = ArtistsData & ErrorHandler
-type ArtworksResponse = ArtworksData 
+type ArtworksResponse = ArtworksData
 
 const handleArtistsResponse = (res: ArtistsResponse) => {
-	if(res.error) {
-		console.error(res.error.message)
-	}
-	console.log(res.artists)
+  if (res.error) {
+    console.error(res.error.message)
+  }
+  console.log(res.artists)
 }
 
 // similar handler for artworks

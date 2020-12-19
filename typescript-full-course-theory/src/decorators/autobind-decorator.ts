@@ -3,32 +3,32 @@
 
 // autobind decorator
 function Autobind(
-	// unused params. make ts happy
-	_: any,
-	_2: string | Symbol,
-	descriptor: PropertyDescriptor
+  // unused params. make ts happy
+  _: any,
+  _2: string | Symbol,
+  descriptor: PropertyDescriptor
 ) {
-	const originalMethod = descriptor.value
-	const moddedDescriptor: PropertyDescriptor = {
-		configurable: true,
-		enumerable: false,
-		// getter here is having a value with some extra work possible to
-		// do before actually returning the value
-		get() {
-			const boundMethod = originalMethod.bind(this)
-			return boundMethod
-		}
-	}
-	return moddedDescriptor
+  const originalMethod = descriptor.value
+  const moddedDescriptor: PropertyDescriptor = {
+    configurable: true,
+    enumerable: false,
+    // getter here is having a value with some extra work possible to
+    // do before actually returning the value
+    get() {
+      const boundMethod = originalMethod.bind(this)
+      return boundMethod
+    }
+  }
+  return moddedDescriptor
 }
 
 class Printer {
-	message = 'this works'
+  message = 'this works'
 
-	@Autobind
-	showMessage() {
-		console.log(this.message)
-	}
+  @Autobind
+  showMessage() {
+    console.log(this.message)
+  }
 }
 
 const printer = new Printer()

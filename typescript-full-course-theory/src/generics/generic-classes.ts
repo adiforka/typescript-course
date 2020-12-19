@@ -3,20 +3,20 @@
 type Primitive = string | number | boolean | bigint
 
 class Store<T extends Primitive> {
-	private data: T[] = []
+  private data: T[] = []
 
-	addItem(item: T) {
-		this.data.push(item)
-	}
+  addItem(item: T) {
+    this.data.push(item)
+  }
 
-	removeItem(item: T) {
-		this.data.splice(this.data.indexOf(item), 1)
-	}
+  removeItem(item: T) {
+    this.data.splice(this.data.indexOf(item), 1)
+  }
 
-	// defensive
-	getItems() {
-		return [...this.data]
-	}
+  // defensive
+  getItems() {
+    return [...this.data]
+  }
 }
 
 const store1 = new Store<string>()
