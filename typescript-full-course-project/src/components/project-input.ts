@@ -27,6 +27,8 @@ export class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
 		// dummy method -- bad practice. this is why inheritnce blows
 	}
 
+  // this returns us a nice tuple or void if validation fails
+  // and an alert is thrown
 	private gatherUserInput(): [string, string, number] | void {
 		const title = this.titleInput.value
 		const desc = this.descInput.value
@@ -36,14 +38,14 @@ export class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
 		const titleValidatable: Validatable = {
 			value: title,
 			required: true,
-			minLen: 2,
+			minLen: 3,
 			maxLen: 30
 		}
 
 		const descValidatable: Validatable = {
 			value: desc,
 			required: true,
-			minLen: 2,
+			minLen: 5,
 			maxLen: 200
 		}
 
