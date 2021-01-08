@@ -2,15 +2,15 @@
 enum E {
   X,
   Y,
-  Z
+  Z,
 }
 
 const f = (a: { X: number }) => {
-  return a.X
-}
+  return a.X;
+};
 
-const result = f(E)
-console.log(result)
+const result = f(E);
+console.log(result);
 
 // enums at compile time
 // to get a type for all the possible enum values: keyof typeof
@@ -18,18 +18,18 @@ enum Temp {
   MILD,
   MODERATE,
   INTENSE,
-  EXTREME
+  EXTREME,
 }
 
-type TempLogLevels = keyof typeof Temp
+type TempLogLevels = keyof typeof Temp;
 
 function printTempWarning(temp: TempLogLevels, message: string) {
-  const num = Temp[temp]
+  const num = Temp[temp];
   if (num >= Temp.INTENSE) {
-    console.log('temp is: ' + temp)
-    console.log('temp indes is: ' + num)
-    console.log('message: ' + message)
+    console.log("temp is: " + temp);
+    console.log("temp indes is: " + num);
+    console.log("message: " + message);
   }
 }
 
-printTempWarning('INTENSE', 'Take cooling precautions')
+printTempWarning("INTENSE", "Take cooling precautions");
