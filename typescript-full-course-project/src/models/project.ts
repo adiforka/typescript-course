@@ -1,6 +1,6 @@
 export enum ProjectStatus {
   ACTIVE,
-  COMPLETED
+  COMPLETED,
 }
 
 export class Project {
@@ -9,6 +9,6 @@ export class Project {
     public title: string,
     public description: string,
     public people: number,
-    public status: ProjectStatus
+    public status: ProjectStatus,
   ) {}
 }
